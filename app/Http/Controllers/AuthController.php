@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Wallet;
 
 class AuthController extends Controller
 {
   public function auth(Request $request)
   {
+    $info = $request->device_name;
     $user = Auth::user();
     if ($user) {
-      $token = $user->createToken('JWT')->plainTextToken;
+      $token = $user->createToken($info['device_name'])->plainTextToken;
       return response()->json(['token' => $token, 'user' => $user], 200);
     }
     return response()->json(['error' => 'Unauthorized'], 401);
@@ -26,11 +27,12 @@ class AuthController extends Controller
 
   public function login(Request $request)
   {
+    $device_name = $request->device_name;
     $credentials = $request->only('email', 'password');
   
     if (Auth::attempt($credentials)) {
       $user = Auth::user();
-      $token = $user->createToken('JWT')->plainTextToken;
+      $token = $user->createToken($device_name)->plainTextToken;
       return response()->json(['token' => $token, 'user' => $user], 200);
     }
     return response()->json(['error' => 'Unauthorized'], 401);
@@ -52,6 +54,7 @@ class AuthController extends Controller
     }
 
     $user = User::create($formData);
+    Wallet::create(['user_id' => $user->id, 'balance' => 0]);
     $token = $user->createToken('JWT')->plainTextToken;
     return response()->json(['token' => $token, 'user' => $user], 201);
   }
