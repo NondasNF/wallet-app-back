@@ -11,6 +11,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('/user/logout-all', [AuthController::class, 'logoutAll']);
   Route::get('/user/logged-devices', [AuthController::class, 'loggedDevices']);
   Route::get('/user/wallet', [WalletController::class, 'index']);
+  Route::put('/user/wallet', [WalletController::class, 'changeStatus']);
   Route::post('/user/transation/deposit', [TransactionController::class, 'deposit']);
   Route::post('/user/transation/transfer', [TransactionController::class, 'transfer']);
   Route::get('/user/transation/history', [TransactionController::class, 'history']);
