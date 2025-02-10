@@ -10,6 +10,11 @@ use App\Models\Wallet;
 
 class AuthController extends Controller
 {
+  /**
+   * Create a new AuthController instance.
+   *
+   * @return void
+   */
   public function auth(Request $request)
   {
     $info = $request->device_name;
@@ -21,10 +26,20 @@ class AuthController extends Controller
     return response()->json(['error' => 'Unauthorized'], 401);
   }
 
+  /**
+   * Get the authenticated User.
+   *
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function user(Request $request) {
     return $request->user();
   }
 
+  /**
+   * Log the user out (Invalidate the token).
+   *
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function login(Request $request)
   {
     $device_name = $request->device_name;
@@ -38,6 +53,11 @@ class AuthController extends Controller
     return response()->json(['error' => 'Unauthorized'], 401);
   }
 
+  /**
+   * Register a User.
+   *
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function register(Request $request)
   {
     $formData = $request->only('name', 'email', 'password', 'password_confirmation');
