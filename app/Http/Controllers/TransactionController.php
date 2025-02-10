@@ -80,4 +80,23 @@ class TransactionController extends Controller
 
         return response()->json(['message' => 'Transfer successful', 'balance' => $wallet->balance]);
     }
+
+    /**
+     * Get the transaction history of the user
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function history(Request $request)
+    {
+        $user = $request->user();
+        $perPage = $request->per_page ?? 10;
+
+        $transactions = Transaction::where('from_user_id', $user->id)
+            ->orWhere('to_user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+        
+        return response()->json($transactions);
+    }
 }
