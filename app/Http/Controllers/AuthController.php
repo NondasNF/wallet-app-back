@@ -42,12 +42,12 @@ class AuthController extends Controller
    */
   public function login(Request $request)
   {
-    $device_name = $request->device_name;
+    $deviceName = $request->userAgent();
     $credentials = $request->only('email', 'password');
   
     if (Auth::attempt($credentials)) {
       $user = Auth::user();
-      $token = $user->createToken($device_name)->plainTextToken;
+      $token = $user->createToken($deviceName)->plainTextToken;
       return response()->json(['token' => $token, 'user' => $user], 200);
     }
     return response()->json(['error' => 'Unauthorized'], 401);
@@ -77,5 +77,22 @@ class AuthController extends Controller
     Wallet::create(['user_id' => $user->id, 'balance' => 0]);
     $token = $user->createToken('JWT')->plainTextToken;
     return response()->json(['token' => $token, 'user' => $user], 201);
+  }
+
+  public function logout(Request $request)
+  {
+    $request->user()->currentAccessToken()->delete();
+    return response()->json(['message' => 'Logged out'], 200);
+  }
+
+  public function logoutAll(Request $request)
+  {
+    $request->user()->tokens()->delete();
+    return response()->json(['message' => 'Logged out from all devices'], 200);
+  }
+
+  public function loggedDevices(Request $request)
+  {
+    return response()->json($request->user()->tokens, 200);
   }
 }
