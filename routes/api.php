@@ -9,6 +9,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('/user', [AuthController::class, 'user']);
   Route::get('/user/wallet', [WalletController::class, 'index']);
   Route::post('/user/transation/deposit', [TransactionController::class, 'deposit']);
+  Route::post('/user/transation/transfer', [TransactionController::class, 'transfer']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
