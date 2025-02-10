@@ -23,6 +23,11 @@ class TransactionController extends Controller
 
         $user = $request->user();
         $wallet = $user->wallet;
+
+        if ($wallet->is_active == 0) {
+            return response()->json(['message' => 'Your wallet is inactive', 'ok' => false], 400);
+        }
+
         $wallet->balance = bcadd($wallet->balance, $request->amount, 2);
         $wallet->save();
         Transaction::create([
@@ -32,7 +37,7 @@ class TransactionController extends Controller
             'type' => 'deposit',
         ]);
 
-        return response()->json(['message' => 'Deposit successful', 'balance' => $wallet->balance]);
+        return response()->json(['message' => 'Deposit successful', 'balance' => $wallet->balance, 'ok' => true]);
     }
 
     /**
@@ -59,11 +64,19 @@ class TransactionController extends Controller
 
 
         if ($wallet->balance < $request->amount) {
-            return response()->json(['message' => 'Insufficient balance'], 400);
+            return response()->json(['message' => 'Insufficient balance', 'ok' => false], 400);
         }
 
         if ($user->id == $toUser->id) {
-            return response()->json(['message' => 'Cannot transfer to the same account'], 400);
+            return response()->json(['message' => 'Cannot transfer to the same account', 'ok' => false], 400);
+        }
+
+        if ($toWallet->is_active == 0) {
+            return response()->json(['message' => 'User wallet destination is inactive', 'ok' => false], 400);
+        }
+
+        if ($wallet->is_active == 0) {
+            return response()->json(['message' => 'Your wallet is inactive', 'ok' => false], 400);
         }
 
         $wallet->balance = bcsub($wallet->balance, $request->amount, 2);
@@ -78,7 +91,7 @@ class TransactionController extends Controller
             'type' => 'transfer',
         ]);
 
-        return response()->json(['message' => 'Transfer successful', 'balance' => $wallet->balance]);
+        return response()->json(['message' => 'Transfer successful', 'balance' => $wallet->balance, 'ok' => true]);
     }
 
     /**
