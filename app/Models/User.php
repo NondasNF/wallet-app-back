@@ -54,4 +54,28 @@ class User extends Authenticatable
     {
         return $this->hasOne(Wallet::class);
     }
+
+    /**
+     * Get the transactions associated with the user.
+     */
+    public function sentTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'from_user_id');
+    }
+
+    /**
+     * Get the transactions associated with the user.
+     */
+    public function receivedTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'to_user_id');
+    }
+
+    /**
+     * Get the transactions associated with the user.
+     */
+    public function transactions()
+    {
+        return $this->sentTransactions->merge($this->receivedTransactions);
+    }
 }
