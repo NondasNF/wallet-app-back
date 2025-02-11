@@ -45,6 +45,15 @@ class AuthController extends Controller
     $deviceName = $request->userAgent();
     $credentials = $request->only('email', 'password');
   
+    $validator = Validator::make($credentials, [
+      'email' => 'required|string|email|max:255',
+      'password' => 'required|string|min:8',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(['errors' => $validator->errors()], 422);
+    }  
+  
     if (Auth::attempt($credentials)) {
       $user = Auth::user();
       $token = $user->createToken($deviceName)->plainTextToken;
