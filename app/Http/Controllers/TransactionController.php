@@ -30,6 +30,7 @@ class TransactionController extends Controller
 
         $wallet->balance = bcadd($wallet->balance, $request->amount, 2);
         $wallet->save();
+
         Transaction::create([
             'from_user_id' => $user->id,
             'to_user_id' => $user->id,
@@ -54,14 +55,13 @@ class TransactionController extends Controller
         ]);
 
         $toWallet = Wallet::find($request->wallet_id);
-        if(!$toWallet) {
+        if (!$toWallet) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
         $toUser = $toWallet->user;
         $user = $request->user();
         $wallet = $user->wallet;
-
 
         if ($wallet->balance < $request->amount) {
             return response()->json(['message' => 'Insufficient balance', 'ok' => false], 400);
@@ -109,13 +109,16 @@ class TransactionController extends Controller
             ->orWhere('to_user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
-        
+
         return response()->json($transactions);
     }
 
     /**
      * Cancel a transaction
      * 
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function cancel(Request $request, $id)
     {
