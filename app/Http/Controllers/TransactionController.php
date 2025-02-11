@@ -135,6 +135,9 @@ class TransactionController extends Controller
         $wallet = $user->wallet;
         $wallet->balance = bcadd($wallet->balance, $transaction->amount, 2);
         $wallet->save();
+        $toWallet = Wallet::find($transaction->to_user_id);
+        $toWallet->balance = bcsub($toWallet->balance, $transaction->amount, 2);
+        $toWallet->save();
         $transaction->type = 'cancelled';
         $transaction->save();
 
