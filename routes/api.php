@@ -12,9 +12,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('/user/logged-devices', [AuthController::class, 'loggedDevices']);
   Route::get('/user/wallet', [WalletController::class, 'index']);
   Route::put('/user/wallet', [WalletController::class, 'changeStatus']);
-  Route::post('/user/transation/deposit', [TransactionController::class, 'deposit']);
-  Route::post('/user/transation/transfer', [TransactionController::class, 'transfer']);
-  Route::get('/user/transation/history', [TransactionController::class, 'history']);
+  Route::post('/user/transaction/deposit', [TransactionController::class, 'deposit']);
+  Route::post('/user/transaction/transfer', [TransactionController::class, 'transfer']);
+  Route::get('/user/transaction/history', [TransactionController::class, 'history']);
+  Route::put('/user/transaction/cancel/{id}', [TransactionController::class, 'cancel']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
