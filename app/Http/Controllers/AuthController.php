@@ -32,7 +32,7 @@ class AuthController extends Controller
    * @return \Illuminate\Http\JsonResponse
    */
   public function user(Request $request) {
-    return $request->user();
+    return response()->json(['user' => $request->user(), 'ok' => true], 200);
   }
 
   /**
@@ -60,6 +60,7 @@ class AuthController extends Controller
    */
   public function register(Request $request)
   {
+    $deviceName = $request->userAgent();
     $formData = $request->only('name', 'email', 'password', 'password_confirmation');
 
     $validator = Validator::make($formData, [
@@ -75,7 +76,7 @@ class AuthController extends Controller
 
     $user = User::create($formData);
     Wallet::create(['user_id' => $user->id, 'balance' => 0]);
-    $token = $user->createToken('JWT')->plainTextToken;
+    $token = $user->createToken($deviceName)->plainTextToken;
     return response()->json(['token' => $token, 'user' => $user, 'message' => 'User created successfully', 'ok' => true], 201);
   }
 
@@ -108,6 +109,6 @@ class AuthController extends Controller
    */
   public function loggedDevices(Request $request)
   {
-    return response()->json([$request->user()->tokens, 'ok' => true], 200);
+    return response()->json(['devices' => $request->user()->tokens, 'ok' => true], 200);
   }
 }
