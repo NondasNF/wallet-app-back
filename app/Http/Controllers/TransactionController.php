@@ -112,4 +112,32 @@ class TransactionController extends Controller
         
         return response()->json($transactions);
     }
+
+    /**
+     * Cancel a transaction
+     * 
+     */
+    public function cancel(Request $request, $id)
+    {
+        $user = $request->user();
+        $transaction = Transaction::where('id', $id)
+            ->where('from_user_id', $user->id)
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['message' => 'Transaction not found', 'ok' => false], 404);
+        }
+
+        if ($transaction->type == 'deposit') {
+            return response()->json(['message' => 'Cannot cancel a deposit transaction', 'ok' => false], 400);
+        }
+
+        $wallet = $user->wallet;
+        $wallet->balance = bcadd($wallet->balance, $transaction->amount, 2);
+        $wallet->save();
+        $transaction->type = 'cancelled';
+        $transaction->save();
+
+        return response()->json(['message' => 'Transaction cancelled', 'ok' => true]);
+    }
 }
